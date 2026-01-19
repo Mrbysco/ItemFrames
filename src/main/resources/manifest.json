@@ -1,0 +1,25 @@
+{
+    "Group": "ItemFrames",
+    "Name": "ItemFrames",
+    "Version": "0.0.2",
+    "Description": "Adds item frames to display your items",
+    "Authors": [
+        {
+            "Name": "Mrbysco"
+        },
+        {
+            "Name": "ShyNieke"
+        }
+    ],
+    "Website": "https://www.curseforge.com/hytale/mods/item-frames",
+    "ServerVersion": "*",
+    "Dependencies": {
+        "Hytale:EntityModule": "*"
+    },
+    "OptionalDependencies": {
+        
+    },
+    "DisabledByDefault": false,
+    "Main": "com.mrbysco.itemframes.ItemFramePlugin",
+    "IncludesAssetPack": true
+}

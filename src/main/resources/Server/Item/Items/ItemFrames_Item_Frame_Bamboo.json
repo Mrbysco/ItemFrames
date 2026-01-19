@@ -1,0 +1,81 @@
+{
+  "TranslationProperties": {
+    "Name": "items.ItemFrames_Item_Frame_Bamboo.name"
+  },
+  "Icon": "Icons/ItemsGenerated/ItemFrames_Item_Frame_Bamboo.png",
+  "Categories": [
+    "Blocks.Deco"
+  ],
+  "Set": "ItemFrames_Item_Frame",
+  "BlockType": {
+    "Material": "Solid",
+    "DrawType": "Model",
+    "Opacity": "Transparent",
+    "CustomModel": "Blocks/Decorative_Sets/Jungle/Painting.blockymodel",
+    "CustomModelTexture": [
+      {
+        "Weight": 1,
+        "Texture": "Blocks/Decorative_Sets/Jungle/Painting_Texture.png"
+      }
+    ],
+    "BlockEntity": {
+      "Components": {}
+    },
+    "CustomModelScale": 1,
+    "HitboxType": "Painting",
+    "VariantRotation": "NESW",
+    "Gathering": {
+      "Soft": {}
+    },
+    "BlockParticleSetId": "Wood",
+    "BlockSoundSetId": "Wood",
+    "Support": {
+      "North": [
+        {
+          "FaceType": "Full"
+        }
+      ]
+    },
+    "ParticleColor": "#5b3222",
+    "InteractionHint": "server.interactionHints.interactItemFrame",
+    "Interactions": {
+      "Use": {
+        "Interactions": [
+          {
+            "Type": "ItemFrameInteraction"
+          }
+        ]
+      }
+    }
+  },
+  "PlayerAnimationsId": "Block",
+  "IconProperties": {
+    "Scale": 0.68,
+    "Rotation": [
+      22.5,
+      45,
+      22.5
+    ],
+    "Translation": [
+      8.5,
+      -19.7
+    ]
+  },
+  "ResourceTypes": [
+    {
+      "Id": "Fuel"
+    },
+    {
+      "Id": "Charcoal"
+    }
+  ],
+  "Tags": {
+    "Type": [
+      "Furniture"
+    ],
+    "Family": [
+      "Village"
+    ]
+  },
+  "ItemSoundSetId": "ISS_Blocks_Wood"
+}
