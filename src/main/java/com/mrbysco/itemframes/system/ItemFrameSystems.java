@@ -29,6 +29,7 @@ import com.hypixel.hytale.server.core.modules.entity.item.PreventItemMerging;
 import com.hypixel.hytale.server.core.modules.entity.item.PreventPickup;
 import com.hypixel.hytale.server.core.modules.entity.tracker.NetworkId;
 import com.hypixel.hytale.server.core.modules.interaction.Interactions;
+import com.hypixel.hytale.server.core.prefab.PrefabCopyableComponent;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
@@ -112,6 +113,7 @@ public class ItemFrameSystems {
 			UUID uuid = UUID.randomUUID();
 			holder.putComponent(UUIDComponent.getComponentType(), new UUIDComponent(uuid));
 			holder.ensureComponent(Interactable.getComponentType());
+			holder.ensureComponent(PrefabCopyableComponent.getComponentType());
 
 			Interactions interactions = new Interactions();
 			interactions.setInteractionId(InteractionType.Use, "Interact_With_Item_Frame");
