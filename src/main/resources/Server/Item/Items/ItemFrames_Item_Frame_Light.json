@@ -7,6 +7,27 @@
     "Blocks.Deco"
   ],
   "Set": "ItemFrames_Item_Frame",
+  "Recipe": {
+    "Input": [
+      {
+        "ItemId": "Rock_Marble",
+        "Quantity": 2
+      },
+      {
+        "ItemId": "Ingredient_Tree_Sap",
+        "Quantity": 1
+      }
+    ],
+    "BenchRequirement": [
+      {
+        "Type": "Crafting",
+        "Id": "Furniture_Bench",
+        "Categories": [
+          "Furniture_Misc"
+        ]
+      }
+    ]
+  },
   "BlockType": {
     "Material": "Solid",
     "DrawType": "Model",
