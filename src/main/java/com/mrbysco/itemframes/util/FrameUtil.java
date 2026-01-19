@@ -51,14 +51,15 @@ public class FrameUtil {
 		float scale = 0.5F;
 
 		if (stack != null) {
-			Item item = stack.getItem();
+			ItemStack newStack = new ItemStack(stack.getItemId(), 1);
+			Item item = newStack.getItem();
 			AssetIconProperties properties = item.getIconProperties();
 			if (properties != null) {
 				scale = properties.getScale();
 			}
 
-			stack.setOverrideDroppedItemAnimation(true);
-			holder.addComponent(ItemComponent.getComponentType(), new ItemComponent(stack));
+			newStack.setOverrideDroppedItemAnimation(true);
+			holder.addComponent(ItemComponent.getComponentType(), new ItemComponent(newStack));
 
 			Model model = getItemModel(item);
 			if (model != null) {
@@ -71,7 +72,7 @@ public class FrameUtil {
 					);
 				}
 			} else if (item.hasBlockType()) {
-				holder.addComponent(BlockEntity.getComponentType(), new BlockEntity(stack.getItemId()));
+				holder.addComponent(BlockEntity.getComponentType(), new BlockEntity(newStack.getItemId()));
 				holder.addComponent(EntityScaleComponent.getComponentType(), new EntityScaleComponent(scale * 2.0F));
 			} else {
 				holder.addComponent(EntityScaleComponent.getComponentType(), new EntityScaleComponent(scale));
