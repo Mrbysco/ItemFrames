@@ -19,6 +19,7 @@ import com.hypixel.hytale.protocol.InteractionType;
 import com.hypixel.hytale.server.core.asset.type.blocktype.config.BlockType;
 import com.hypixel.hytale.server.core.asset.type.blocktype.config.RotationTuple;
 import com.hypixel.hytale.server.core.entity.UUIDComponent;
+import com.hypixel.hytale.server.core.event.events.ecs.BreakBlockEvent;
 import com.hypixel.hytale.server.core.event.events.ecs.PlaceBlockEvent;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.modules.block.BlockModule;
@@ -46,7 +47,6 @@ import javax.annotation.Nonnull;
 import java.util.UUID;
 
 public class ItemFrameSystems {
-
 	public static class PlaceSystem extends EntityEventSystem<EntityStore, PlaceBlockEvent> {
 
 		public PlaceSystem() {
@@ -122,6 +122,29 @@ public class ItemFrameSystems {
 
 			store.addEntity(holder, AddReason.SPAWN);
 			return uuid;
+		}
+
+		@NullableDecl
+		@Override
+		public Query<EntityStore> getQuery() {
+			return PlayerRef.getComponentType();
+		}
+	}
+
+	public static class BreakSystem extends EntityEventSystem<EntityStore, BreakBlockEvent> {
+		public BreakSystem() {
+			super(BreakBlockEvent.class);
+		}
+
+		@Override
+		public void handle(int index, @Nonnull ArchetypeChunk<EntityStore> archetypeChunk,
+		                   @Nonnull Store<EntityStore> store, @Nonnull CommandBuffer<EntityStore> commandBuffer,
+		                   @Nonnull BreakBlockEvent event) {
+			World world = commandBuffer.getExternalData().getWorld();
+			Ref<EntityStore> frameRef = FrameUtil.getFrameEntity(world, event.getTargetBlock());
+			if (frameRef == null) return;
+			ItemFramePlugin.LOGGER.atInfo().log("Removing Item Frame Entity: " + frameRef);
+			commandBuffer.removeEntity(frameRef, RemoveReason.REMOVE);
 		}
 
 		@NullableDecl

@@ -45,6 +45,7 @@ public class ItemFramePlugin extends JavaPlugin {
 
 		ComponentRegistryProxy<EntityStore> componentregistryproxy = this.getEntityStoreRegistry();
 		componentregistryproxy.registerSystem(new ItemFrameSystems.PlaceSystem());
+		componentregistryproxy.registerSystem(new ItemFrameSystems.BreakSystem());
 		componentregistryproxy.registerSystem(new ItemFrameSystems.ItemFrameTick());
 	}
 
