@@ -54,6 +54,9 @@
       "North": [
         {
           "FaceType": "Full"
+        },
+        {
+          "TagId": "Type=Furniture"
         }
       ]
     },
