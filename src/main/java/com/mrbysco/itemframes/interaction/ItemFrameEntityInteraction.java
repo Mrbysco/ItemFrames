@@ -52,8 +52,15 @@ public class ItemFrameEntityInteraction extends SimpleInstantInteraction {
 			int x = targetBlock.getX();
 			int y = targetBlock.getY();
 			int z = targetBlock.getZ();
+			ItemStack heldStack = frameComponent.getHeldStack();
 
-			if (frameComponent.getHeldStack() == null) {
+			if (heldStack != null && !heldStack.isEmpty()) {
+				ItemHelper.spawnItem(commandBuffer, frameComponent, targetRef);
+				frameComponent.setHeldStack(null);
+			}
+
+			heldStack = frameComponent.getHeldStack();
+			if (heldStack == null) {
 				if (itemstack == null || itemstack.isEmpty()) {
 					context.getState().state = InteractionState.Failed;
 				} else {
@@ -67,24 +74,14 @@ public class ItemFrameEntityInteraction extends SimpleInstantInteraction {
 						}
 
 						frameComponent.setHeldStack(stackClone);
-						commandBuffer.run(entityStore -> {
-							FrameUtil.remakeItemEntity(entityStore, targetRef, stackClone, yawDegrees);
-							world.performBlockUpdate(x, y, z);
-						});
-						context.getState().state = InteractionState.Finished;
 					}
 				}
-			} else {
-				if (itemstack == null || itemstack.isEmpty()) {
-					ItemHelper.spawnItem(commandBuffer, frameComponent, targetRef);
-					frameComponent.setHeldStack(null);
-					commandBuffer.run(entityStore -> {
-						FrameUtil.remakeItemEntity(entityStore, targetRef, null, yawDegrees);
-						world.performBlockUpdate(x, y, z);
-					});
-					context.getState().state = InteractionState.Finished;
-				}
 			}
+
+			commandBuffer.run(entityStore -> {
+				FrameUtil.remakeItemEntity(entityStore, targetRef, frameComponent.getHeldStack(), yawDegrees);
+				world.performBlockUpdate(x, y, z);
+			});
 		} else {
 			context.getState().state = InteractionState.Failed;
 			return;

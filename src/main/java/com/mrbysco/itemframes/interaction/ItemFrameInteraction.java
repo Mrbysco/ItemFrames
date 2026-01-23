@@ -55,6 +55,10 @@ public class ItemFrameInteraction extends SimpleBlockInteraction {
 		long indexChunk = ChunkUtil.indexChunkFromBlock(x, z);
 		WorldChunk worldchunk = world.getChunk(indexChunk);
 		BlockType blockType = worldchunk.getBlockType(targetBlock);
+		if (blockType == null) {
+			context.getState().state = InteractionState.Failed;
+			return;
+		}
 		var chunkRef = worldchunk.getBlockComponentEntity(x, y, z);
 		if (chunkRef == null) {
 			chunkRef = BlockModule.ensureBlockEntity(worldchunk, x, y, z);
@@ -77,8 +81,15 @@ public class ItemFrameInteraction extends SimpleBlockInteraction {
 					return;
 				}
 				int yawDegrees = frameComponent.getFrameRotation();
+				ItemStack heldStack = frameComponent.getHeldStack();
 
-				if (frameComponent.getHeldStack() == null) {
+				if (heldStack != null && !heldStack.isEmpty()) {
+					ItemHelper.spawnItem(commandBuffer, frameComponent, boundRef);
+					frameComponent.setHeldStack(null);
+				}
+
+				heldStack = frameComponent.getHeldStack();
+				if (heldStack == null) {
 					if (itemstack == null || itemstack.isEmpty()) {
 						context.getState().state = InteractionState.Failed;
 					} else {
@@ -92,22 +103,14 @@ public class ItemFrameInteraction extends SimpleBlockInteraction {
 							}
 
 							frameComponent.setHeldStack(stackClone);
-							commandBuffer.run(entityStore -> {
-								FrameUtil.remakeItemEntity(entityStore, boundRef, stackClone, yawDegrees);
-								world.performBlockUpdate(x, y, z);
-							});
 						}
 					}
-				} else {
-					if (itemstack == null || itemstack.isEmpty()) {
-						ItemHelper.spawnItem(commandBuffer, frameComponent, boundRef);
-						frameComponent.setHeldStack(null);
-						commandBuffer.run(entityStore -> {
-							FrameUtil.remakeItemEntity(entityStore, boundRef, null, yawDegrees);
-							world.performBlockUpdate(x, y, z);
-						});
-					}
 				}
+
+				commandBuffer.run(entityStore -> {
+					FrameUtil.remakeItemEntity(entityStore, boundRef, frameComponent.getHeldStack(), yawDegrees);
+					world.performBlockUpdate(x, y, z);
+				});
 			}
 		}
 	}
