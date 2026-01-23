@@ -14,7 +14,6 @@ import com.hypixel.hytale.server.core.modules.interaction.interaction.CooldownHa
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.SimpleInstantInteraction;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import com.mrbysco.itemframes.ItemFramePlugin;
 import com.mrbysco.itemframes.component.ItemFrameComponent;
 import com.mrbysco.itemframes.util.FrameUtil;
 import com.mrbysco.itemframes.util.ItemHelper;
@@ -48,6 +47,7 @@ public class ItemFrameEntityInteraction extends SimpleInstantInteraction {
 		ItemStack itemstack = context.getHeldItem();
 		ItemFrameComponent frameComponent = commandBuffer.getComponent(targetRef, ItemFrameComponent.getComponentType());
 		if (frameComponent != null) {
+			int yawDegrees = frameComponent.getFrameRotation();
 			Vector3i targetBlock = frameComponent.getFramePosition();
 			int x = targetBlock.getX();
 			int y = targetBlock.getY();
@@ -68,9 +68,10 @@ public class ItemFrameEntityInteraction extends SimpleInstantInteraction {
 
 						frameComponent.setHeldStack(stackClone);
 						commandBuffer.run(entityStore -> {
-							FrameUtil.remakeItemEntity(entityStore, targetRef, stackClone);
+							FrameUtil.remakeItemEntity(entityStore, targetRef, stackClone, yawDegrees);
 							world.performBlockUpdate(x, y, z);
 						});
+						context.getState().state = InteractionState.Finished;
 					}
 				}
 			} else {
@@ -78,17 +79,15 @@ public class ItemFrameEntityInteraction extends SimpleInstantInteraction {
 					ItemHelper.spawnItem(commandBuffer, frameComponent, targetRef);
 					frameComponent.setHeldStack(null);
 					commandBuffer.run(entityStore -> {
-						FrameUtil.remakeItemEntity(entityStore, targetRef, null);
+						FrameUtil.remakeItemEntity(entityStore, targetRef, null, yawDegrees);
 						world.performBlockUpdate(x, y, z);
 					});
+					context.getState().state = InteractionState.Finished;
 				}
 			}
 		} else {
 			context.getState().state = InteractionState.Failed;
 			return;
 		}
-
-		ItemFramePlugin.LOGGER.atInfo().log("Interacted with Item Frame Entity: " + targetRef);
-
 	}
 }

@@ -6,7 +6,9 @@ import com.hypixel.hytale.component.Holder;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.RemoveReason;
 import com.hypixel.hytale.component.Store;
+import com.hypixel.hytale.math.Axis;
 import com.hypixel.hytale.math.util.ChunkUtil;
+import com.hypixel.hytale.math.vector.Vector3f;
 import com.hypixel.hytale.math.vector.Vector3i;
 import com.hypixel.hytale.server.core.asset.type.blocktype.config.BlockType;
 import com.hypixel.hytale.server.core.asset.type.item.config.AssetIconProperties;
@@ -17,6 +19,7 @@ import com.hypixel.hytale.server.core.entity.entities.BlockEntity;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.modules.block.BlockModule;
 import com.hypixel.hytale.server.core.modules.entity.component.EntityScaleComponent;
+import com.hypixel.hytale.server.core.modules.entity.component.HeadRotation;
 import com.hypixel.hytale.server.core.modules.entity.component.ModelComponent;
 import com.hypixel.hytale.server.core.modules.entity.component.PersistentModel;
 import com.hypixel.hytale.server.core.modules.entity.item.ItemComponent;
@@ -138,7 +141,7 @@ public class FrameUtil {
 			int y = pos.getY();
 			int z = pos.getZ();
 			frameComponent.setHeldStack(stack);
-			FrameUtil.remakeItemEntity(store, frameRef, stack);
+			FrameUtil.remakeItemEntity(store, frameRef, stack, frameComponent.getFrameRotation());
 			world.performBlockUpdate(x, y, z);
 			return true;
 		}
@@ -180,7 +183,8 @@ public class FrameUtil {
 	public static Ref<EntityStore> remakeItemEntity(
 			@Nonnull Store<EntityStore> store,
 			@Nonnull Ref<EntityStore> oldRef,
-			@Nullable ItemStack stack
+			@Nullable ItemStack stack,
+			int yawDegrees
 	) {
 		// Remove existing variant-specific components
 		removeVariantComponents(store, oldRef);
@@ -214,6 +218,16 @@ public class FrameUtil {
 			} else if (item.hasBlockType()) {
 				holder.addComponent(BlockEntity.getComponentType(), new BlockEntity(newStack.getItemId()));
 				holder.addComponent(EntityScaleComponent.getComponentType(), new EntityScaleComponent(scale * 2.0F));
+
+				HeadRotation headRotation = store.getComponent(oldRef, HeadRotation.getComponentType());
+				if (headRotation != null) {
+					Vector3f oldRotation = headRotation.getRotation();
+					Vector3f rotation = new Vector3f();
+					rotation.setPitch(oldRotation.getPitch());
+					rotation.addRotationOnAxis(Axis.Y, yawDegrees + 180);
+
+					holder.putComponent(HeadRotation.getComponentType(), new HeadRotation(rotation));
+				}
 			} else {
 				holder.addComponent(EntityScaleComponent.getComponentType(), new EntityScaleComponent(scale));
 			}

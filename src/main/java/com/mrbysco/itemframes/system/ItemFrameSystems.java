@@ -70,14 +70,15 @@ public class ItemFrameSystems {
 			Holder<EntityStore> holder = EntityStore.REGISTRY.newHolder();
 			blockPos.add(0.5, 0.25, 0.5);
 
+			int yawDegrees = rotationTuple.yaw().getDegrees();
 			Vector3f rotation = new Vector3f();
-			rotation.addRotationOnAxis(Axis.Y, rotationTuple.yaw().getDegrees() - 90);
+			rotation.addRotationOnAxis(Axis.Y, yawDegrees - 90);
 			rotation.addRotationOnAxis(Axis.X, rotationTuple.pitch().getDegrees());
 
-			holder.putComponent(ItemFrameComponent.getComponentType(), new ItemFrameComponent(null, targetBlock));
+			holder.putComponent(ItemFrameComponent.getComponentType(), new ItemFrameComponent(null, targetBlock, yawDegrees));
 
-			UUID spawnedUUID = spawnItem(commandBuffer, holder, blockPos, rotation, rotationTuple.yaw().getDegrees());
-			ItemFramePlugin.LOGGER.atInfo().log("Spawned Item Frame with UUID: " + spawnedUUID);
+			UUID spawnedUUID = spawnItem(commandBuffer, holder, blockPos, rotation, yawDegrees);
+//			ItemFramePlugin.LOGGER.atInfo().log("Spawned Item Frame with UUID: " + spawnedUUID);
 			if (spawnedUUID != null) {
 				commandBuffer.run((entityStore) -> {
 					int i = targetBlock.getX();
@@ -145,7 +146,7 @@ public class ItemFrameSystems {
 			World world = commandBuffer.getExternalData().getWorld();
 			Ref<EntityStore> frameRef = FrameUtil.getFrameEntity(world, event.getTargetBlock());
 			if (frameRef == null) return;
-			ItemFramePlugin.LOGGER.atInfo().log("Removing Item Frame Entity: " + frameRef);
+//			ItemFramePlugin.LOGGER.atInfo().log("Removing Item Frame Entity: " + frameRef);
 			commandBuffer.removeEntity(frameRef, RemoveReason.REMOVE);
 		}
 

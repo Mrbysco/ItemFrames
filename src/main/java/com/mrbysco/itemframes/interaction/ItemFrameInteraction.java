@@ -76,6 +76,7 @@ public class ItemFrameInteraction extends SimpleBlockInteraction {
 					context.getState().state = InteractionState.Failed;
 					return;
 				}
+				int yawDegrees = frameComponent.getFrameRotation();
 
 				if (frameComponent.getHeldStack() == null) {
 					if (itemstack == null || itemstack.isEmpty()) {
@@ -92,7 +93,7 @@ public class ItemFrameInteraction extends SimpleBlockInteraction {
 
 							frameComponent.setHeldStack(stackClone);
 							commandBuffer.run(entityStore -> {
-								FrameUtil.remakeItemEntity(entityStore, boundRef, stackClone);
+								FrameUtil.remakeItemEntity(entityStore, boundRef, stackClone, yawDegrees);
 								world.performBlockUpdate(x, y, z);
 							});
 						}
@@ -102,7 +103,7 @@ public class ItemFrameInteraction extends SimpleBlockInteraction {
 						ItemHelper.spawnItem(commandBuffer, frameComponent, boundRef);
 						frameComponent.setHeldStack(null);
 						commandBuffer.run(entityStore -> {
-							FrameUtil.remakeItemEntity(entityStore, boundRef, null);
+							FrameUtil.remakeItemEntity(entityStore, boundRef, null, yawDegrees);
 							world.performBlockUpdate(x, y, z);
 						});
 					}

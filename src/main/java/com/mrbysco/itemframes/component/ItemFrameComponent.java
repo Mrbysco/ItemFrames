@@ -1,5 +1,6 @@
 package com.mrbysco.itemframes.component;
 
+import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.component.Component;
@@ -13,6 +14,7 @@ public class ItemFrameComponent implements Component<EntityStore> {
 	public static final BuilderCodec CODEC;
 	private ItemStack heldStack;
 	private Vector3i framePosition;
+	private int frameRotation = 0;
 
 	public static ComponentType<EntityStore, ItemFrameComponent> getComponentType() {
 		return ItemFramePlugin.get().getItemFrameComponent();
@@ -21,9 +23,10 @@ public class ItemFrameComponent implements Component<EntityStore> {
 	private ItemFrameComponent() {
 	}
 
-	public ItemFrameComponent(ItemStack itemStack, Vector3i position) {
+	public ItemFrameComponent(ItemStack itemStack, Vector3i position, int rotation) {
 		this.heldStack = itemStack;
 		this.framePosition = position;
+		this.frameRotation = rotation;
 	}
 
 	public ItemStack getHeldStack() {
@@ -42,8 +45,16 @@ public class ItemFrameComponent implements Component<EntityStore> {
 		this.framePosition = framePosition;
 	}
 
+	public int getFrameRotation() {
+		return frameRotation;
+	}
+
+	public void setFrameRotation(int frameRotation) {
+		this.frameRotation = frameRotation;
+	}
+
 	public Component<EntityStore> clone() {
-		return new ItemFrameComponent(this.heldStack, this.framePosition);
+		return new ItemFrameComponent(this.heldStack, this.framePosition, this.frameRotation);
 	}
 
 	static {
@@ -52,8 +63,11 @@ public class ItemFrameComponent implements Component<EntityStore> {
 						(component, stack) -> component.heldStack = stack,
 						(component) -> component.heldStack).add()
 				.append(new KeyedCodec<>("FramePosition", Vector3i.CODEC),
-						(component, stack) -> component.framePosition = stack,
+						(component, pos) -> component.framePosition = pos,
 						(component) -> component.framePosition).add()
+				.append(new KeyedCodec<>("FrameRotation", Codec.INTEGER),
+						(component, rot) -> component.frameRotation = rot,
+						(component) -> component.frameRotation).add()
 				.build();
 	}
 }
