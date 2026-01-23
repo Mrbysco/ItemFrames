@@ -25,6 +25,7 @@ import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.modules.block.BlockModule;
 import com.hypixel.hytale.server.core.modules.entity.component.HeadRotation;
 import com.hypixel.hytale.server.core.modules.entity.component.Interactable;
+import com.hypixel.hytale.server.core.modules.entity.component.PropComponent;
 import com.hypixel.hytale.server.core.modules.entity.component.TransformComponent;
 import com.hypixel.hytale.server.core.modules.entity.item.PreventItemMerging;
 import com.hypixel.hytale.server.core.modules.entity.item.PreventPickup;
@@ -113,6 +114,7 @@ public class ItemFrameSystems {
 			UUID uuid = UUID.randomUUID();
 			holder.putComponent(UUIDComponent.getComponentType(), new UUIDComponent(uuid));
 			holder.ensureComponent(Interactable.getComponentType());
+			holder.ensureComponent(PropComponent.getComponentType());
 			holder.ensureComponent(PrefabCopyableComponent.getComponentType());
 
 			Interactions interactions = new Interactions();
