@@ -89,6 +89,8 @@ public class ItemFrameInteraction extends SimpleBlockInteraction {
 				}
 
 				heldStack = frameComponent.getHeldStack();
+				// Clone the held stack for comparison later
+				ItemStack heldClone = heldStack != null ? heldStack.withQuantity(1) : null;
 				if (heldStack == null) {
 					if (itemstack == null || itemstack.isEmpty()) {
 						context.getState().state = InteractionState.Failed;
@@ -107,10 +109,12 @@ public class ItemFrameInteraction extends SimpleBlockInteraction {
 					}
 				}
 
-				commandBuffer.run(entityStore -> {
-					FrameUtil.remakeItemEntity(entityStore, boundRef, frameComponent.getHeldStack(), yawDegrees);
-					world.performBlockUpdate(x, y, z);
-				});
+				if (heldClone != frameComponent.getHeldStack()) {
+					commandBuffer.run(entityStore -> {
+						FrameUtil.remakeItemEntity(entityStore, boundRef, frameComponent.getHeldStack(), yawDegrees);
+						world.performBlockUpdate(x, y, z);
+					});
+				}
 			}
 		}
 	}

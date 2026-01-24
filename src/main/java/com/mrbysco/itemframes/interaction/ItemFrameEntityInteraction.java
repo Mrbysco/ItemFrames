@@ -53,6 +53,8 @@ public class ItemFrameEntityInteraction extends SimpleInstantInteraction {
 			int y = targetBlock.getY();
 			int z = targetBlock.getZ();
 			ItemStack heldStack = frameComponent.getHeldStack();
+			// Clone the held stack for comparison later
+			ItemStack heldClone = heldStack != null ? heldStack.withQuantity(1) : null;
 
 			if (heldStack != null && !heldStack.isEmpty()) {
 				ItemHelper.spawnItem(commandBuffer, frameComponent, targetRef);
@@ -78,10 +80,12 @@ public class ItemFrameEntityInteraction extends SimpleInstantInteraction {
 				}
 			}
 
-			commandBuffer.run(entityStore -> {
-				FrameUtil.remakeItemEntity(entityStore, targetRef, frameComponent.getHeldStack(), yawDegrees);
-				world.performBlockUpdate(x, y, z);
-			});
+			if (heldClone != frameComponent.getHeldStack()) {
+				commandBuffer.run(entityStore -> {
+					FrameUtil.remakeItemEntity(entityStore, targetRef, frameComponent.getHeldStack(), yawDegrees);
+					world.performBlockUpdate(x, y, z);
+				});
+			}
 		} else {
 			context.getState().state = InteractionState.Failed;
 			return;
