@@ -1,6 +1,7 @@
 package com.mrbysco.itemframes.util;
 
 import com.hypixel.hytale.component.AddReason;
+import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.component.Holder;
 import com.hypixel.hytale.component.Ref;
@@ -122,7 +123,7 @@ public class FrameUtil {
 	 * @param overwrite Whether to overwrite the existing item if present
 	 * @return True if the item was set successfully, false otherwise
 	 */
-	public static boolean setFrameItem(World world, Vector3i pos, @Nullable ItemStack stack, boolean overwrite) {
+	public static boolean setFrameItem(CommandBuffer<EntityStore> commandBuffer, World world, Vector3i pos, @Nullable ItemStack stack, boolean overwrite) {
 		if (!isFrameBlock(world, pos)) return false;
 
 		Ref<EntityStore> frameRef = getFrameEntity(world, pos);
@@ -141,8 +142,10 @@ public class FrameUtil {
 			int y = pos.getY();
 			int z = pos.getZ();
 			frameComponent.setHeldStack(stack);
-			FrameUtil.remakeItemEntity(store, frameRef, stack, frameComponent.getFrameRotation());
-			world.performBlockUpdate(x, y, z);
+			commandBuffer.run(entityStore -> {
+				FrameUtil.remakeItemEntity(entityStore, frameRef, stack, frameComponent.getFrameRotation());
+				world.performBlockUpdate(x, y, z);
+			});
 			return true;
 		}
 		return false;
