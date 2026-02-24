@@ -146,7 +146,13 @@ public class ItemFrameSystems {
 			World world = commandBuffer.getExternalData().getWorld();
 			Ref<EntityStore> frameRef = FrameUtil.getFrameEntity(world, event.getTargetBlock());
 			if (frameRef == null) return;
-//			ItemFramePlugin.LOGGER.atInfo().log("Removing Item Frame Entity: " + frameRef);
+			ItemFrameComponent frameComponent = store.getComponent(frameRef, ItemFrameComponent.getComponentType());
+			if (frameComponent != null) {
+				commandBuffer.run((entityStore) -> {
+					ItemHelper.spawnItem(entityStore, frameComponent, frameRef);
+				});
+			}
+			ItemFramePlugin.LOGGER.atInfo().log("Removing Item Frame Entity: " + frameRef);
 			commandBuffer.removeEntity(frameRef, RemoveReason.REMOVE);
 		}
 
