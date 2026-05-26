@@ -12,7 +12,7 @@
         }
     ],
     "Website": "https://www.curseforge.com/hytale/mods/item-frames",
-    "ServerVersion": "2026.02.19-1a311a592",
+    "ServerVersion": ">=0.5.0 <0.6.0",
     "Dependencies": {
         "Hytale:EntityModule": "*"
     },

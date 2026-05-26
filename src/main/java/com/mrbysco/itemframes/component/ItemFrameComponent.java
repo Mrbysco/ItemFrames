@@ -5,10 +5,11 @@ import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.ComponentType;
-import com.hypixel.hytale.math.vector.Vector3i;
+import com.hypixel.hytale.math.vector.Vector3iUtil;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.mrbysco.itemframes.ItemFramePlugin;
+import org.joml.Vector3i;
 
 public class ItemFrameComponent implements Component<EntityStore> {
 	public static final BuilderCodec CODEC;
@@ -62,7 +63,7 @@ public class ItemFrameComponent implements Component<EntityStore> {
 				.append(new KeyedCodec<>("HeldStack", ItemStack.CODEC),
 						(component, stack) -> component.heldStack = stack,
 						(component) -> component.heldStack).add()
-				.append(new KeyedCodec<>("FramePosition", Vector3i.CODEC),
+				.append(new KeyedCodec<>("FramePosition", Vector3iUtil.CODEC),
 						(component, pos) -> component.framePosition = pos,
 						(component) -> component.framePosition).add()
 				.append(new KeyedCodec<>("FrameRotation", Codec.INTEGER),

@@ -12,9 +12,7 @@ import com.hypixel.hytale.component.system.EntityEventSystem;
 import com.hypixel.hytale.component.system.tick.EntityTickingSystem;
 import com.hypixel.hytale.math.Axis;
 import com.hypixel.hytale.math.util.ChunkUtil;
-import com.hypixel.hytale.math.vector.Vector3d;
-import com.hypixel.hytale.math.vector.Vector3f;
-import com.hypixel.hytale.math.vector.Vector3i;
+import com.hypixel.hytale.math.vector.Rotation3f;
 import com.hypixel.hytale.protocol.InteractionType;
 import com.hypixel.hytale.server.core.asset.type.blocktype.config.BlockType;
 import com.hypixel.hytale.server.core.asset.type.blocktype.config.RotationTuple;
@@ -43,6 +41,8 @@ import com.mrbysco.itemframes.component.ItemFrameComponent;
 import com.mrbysco.itemframes.util.FrameUtil;
 import com.mrbysco.itemframes.util.ItemHelper;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+import org.joml.Vector3d;
+import org.joml.Vector3i;
 
 import javax.annotation.Nonnull;
 import java.util.UUID;
@@ -64,14 +64,14 @@ public class ItemFrameSystems {
 			if (!FrameUtil.isItemFrame(itemId)) return;
 
 			Vector3i targetBlock = event.getTargetBlock();
-			Vector3d blockPos = targetBlock.toVector3d();
+			Vector3d blockPos = new Vector3d(targetBlock.x, targetBlock.y, targetBlock.z);
 			RotationTuple rotationTuple = event.getRotation();
 
 			Holder<EntityStore> holder = EntityStore.REGISTRY.newHolder();
 			blockPos.add(0.5, 0.25, 0.5);
 
 			int yawDegrees = rotationTuple.yaw().getDegrees();
-			Vector3f rotation = new Vector3f();
+			Rotation3f rotation = new Rotation3f();
 			rotation.addRotationOnAxis(Axis.Y, yawDegrees - 90);
 			rotation.addRotationOnAxis(Axis.X, rotationTuple.pitch().getDegrees());
 
@@ -81,8 +81,8 @@ public class ItemFrameSystems {
 //			ItemFramePlugin.LOGGER.atInfo().log("Spawned Item Frame with UUID: " + spawnedUUID);
 			if (spawnedUUID != null) {
 				commandBuffer.run((entityStore) -> {
-					int i = targetBlock.getX();
-					int j = targetBlock.getZ();
+					int i = targetBlock.x;
+					int j = targetBlock.z;
 					long indexChunk = ChunkUtil.indexChunkFromBlock(i, j);
 					WorldChunk worldchunk = world.getChunk(indexChunk);
 					var chunkRef = worldchunk.getBlockComponentEntity(targetBlock.x, targetBlock.y, targetBlock.z);
@@ -98,7 +98,7 @@ public class ItemFrameSystems {
 			}
 		}
 
-		private UUID spawnItem(CommandBuffer<EntityStore> store, Holder<EntityStore> holder, Vector3d position, Vector3f rotation, int yawDegrees) {
+		private UUID spawnItem(CommandBuffer<EntityStore> store, Holder<EntityStore> holder, Vector3d position, Rotation3f rotation, int yawDegrees) {
 			switch (yawDegrees) {
 				case 0 -> position.add(0, 0, -0.4);
 				case 90 -> position.add(-0.4, 0, 0);

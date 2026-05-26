@@ -9,8 +9,7 @@ import com.hypixel.hytale.component.RemoveReason;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.math.Axis;
 import com.hypixel.hytale.math.util.ChunkUtil;
-import com.hypixel.hytale.math.vector.Vector3f;
-import com.hypixel.hytale.math.vector.Vector3i;
+import com.hypixel.hytale.math.vector.Rotation3f;
 import com.hypixel.hytale.server.core.asset.type.blocktype.config.BlockType;
 import com.hypixel.hytale.server.core.asset.type.item.config.AssetIconProperties;
 import com.hypixel.hytale.server.core.asset.type.item.config.Item;
@@ -31,6 +30,7 @@ import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.mrbysco.itemframes.ItemFramePlugin;
 import com.mrbysco.itemframes.component.BoundEntityComponent;
 import com.mrbysco.itemframes.component.ItemFrameComponent;
+import org.joml.Vector3i;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -75,9 +75,9 @@ public class FrameUtil {
 	 * @return The entity store reference of the item frame, or null if not found
 	 */
 	public static Ref<EntityStore> getFrameEntity(World world, Vector3i pos) {
-		int x = pos.getX();
-		int y = pos.getY();
-		int z = pos.getZ();
+		int x = pos.x();
+		int y = pos.y();
+		int z = pos.z();
 		long indexChunk = ChunkUtil.indexChunkFromBlock(x, z);
 		WorldChunk worldchunk = world.getChunk(indexChunk);
 		var chunkRef = worldchunk.getBlockComponentEntity(x, y, z);
@@ -138,9 +138,9 @@ public class FrameUtil {
 		}
 
 		if (frameComponent.getHeldStack() == null || overwrite) {
-			int x = pos.getX();
-			int y = pos.getY();
-			int z = pos.getZ();
+			int x = pos.x;
+			int y = pos.y;
+			int z = pos.z;
 			frameComponent.setHeldStack(stack);
 			commandBuffer.run(entityStore -> {
 				FrameUtil.remakeItemEntity(entityStore, frameRef, stack, frameComponent.getFrameRotation());
@@ -224,9 +224,9 @@ public class FrameUtil {
 
 				HeadRotation headRotation = store.getComponent(oldRef, HeadRotation.getComponentType());
 				if (headRotation != null) {
-					Vector3f oldRotation = headRotation.getRotation();
-					Vector3f rotation = new Vector3f();
-					rotation.setPitch(oldRotation.getPitch());
+					Rotation3f oldRotation = headRotation.getRotation();
+					Rotation3f rotation = new Rotation3f();
+					rotation.setPitch(oldRotation.pitch());
 					rotation.addRotationOnAxis(Axis.Y, yawDegrees + 180);
 
 					holder.putComponent(HeadRotation.getComponentType(), new HeadRotation(rotation));
