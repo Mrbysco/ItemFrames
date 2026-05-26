@@ -3,7 +3,6 @@ package com.mrbysco.itemframes.interaction;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Ref;
-import com.hypixel.hytale.math.vector.Vector3i;
 import com.hypixel.hytale.protocol.InteractionState;
 import com.hypixel.hytale.protocol.InteractionType;
 import com.hypixel.hytale.protocol.WaitForDataFrom;
@@ -18,6 +17,7 @@ import com.mrbysco.itemframes.component.ItemFrameComponent;
 import com.mrbysco.itemframes.util.FrameUtil;
 import com.mrbysco.itemframes.util.ItemHelper;
 import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
+import org.joml.Vector3i;
 
 import javax.annotation.Nonnull;
 
@@ -49,9 +49,9 @@ public class ItemFrameEntityInteraction extends SimpleInstantInteraction {
 		if (frameComponent != null) {
 			int yawDegrees = frameComponent.getFrameRotation();
 			Vector3i targetBlock = frameComponent.getFramePosition();
-			int x = targetBlock.getX();
-			int y = targetBlock.getY();
-			int z = targetBlock.getZ();
+			int x = targetBlock.x;
+			int y = targetBlock.y;
+			int z = targetBlock.z;
 			ItemStack heldStack = frameComponent.getHeldStack();
 			// Clone the held stack for comparison later
 			ItemStack heldClone = heldStack != null ? heldStack.withQuantity(1) : null;
