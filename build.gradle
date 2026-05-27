@@ -1,6 +1,7 @@
 plugins {
     id 'idea'
     id 'java'
+    id 'maven-publish'
     id 'com.azuredoom.hytale-tools' version '1.+'
 }
 
@@ -12,6 +13,8 @@ group = project.group
 
 java {
     toolchain.languageVersion = JavaLanguageVersion.of(java_version)
+    withSourcesJar()
+    withJavadocJar()
 }
 
 hytaleTools {
@@ -34,6 +37,28 @@ hytaleTools {
 
 repositories {
     mavenCentral()
+}
+
+publishing {
+    publications {
+        register('mavenJava', MavenPublication) {
+            groupId "${project.group}.hytale"
+            artifactId base.archivesName.get()
+            version project.version
+            from components.java
+        }
+    }
+    repositories {
+        if (System.getenv().SAP_SECRET) {
+            maven {
+                url "https://maven.saps.dev/releases"
+                credentials {
+                    username = "mrbysco"
+                    password = "${System.getenv().SAP_SECRET}"
+                }
+            }
+        }
+    }
 }
 
 idea {
