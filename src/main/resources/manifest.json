@@ -1,25 +1,25 @@
 {
-    "Group": "ItemFrames",
+    "Group": "com.mrbysco",
     "Name": "ItemFrames",
     "Version": "0.3.3",
     "Description": "Adds item frames to display your items",
     "Authors": [
         {
             "Name": "Mrbysco"
-        },
-        {
-            "Name": "ShyNieke"
         }
     ],
-    "Website": "https://www.curseforge.com/hytale/mods/item-frames",
-    "ServerVersion": "2026.02.19-1a311a592",
+    "Website": "",
+    "ServerVersion": ">=0.5.1 <0.6.0",
     "Dependencies": {
-        "Hytale:EntityModule": "*"
+        "Hytale:AssetModule": "*"
     },
     "OptionalDependencies": {
         
     },
     "DisabledByDefault": false,
     "Main": "com.mrbysco.itemframes.ItemFramePlugin",
-    "IncludesAssetPack": true
+    "IncludesAssetPack": true,
+    "UpdateChecker": {
+        "CurseForge": ""
+    }
 }
