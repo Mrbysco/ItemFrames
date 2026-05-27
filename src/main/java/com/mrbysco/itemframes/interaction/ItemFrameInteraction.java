@@ -5,7 +5,6 @@ import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.math.util.ChunkUtil;
-import com.hypixel.hytale.math.vector.Vector3i;
 import com.hypixel.hytale.protocol.InteractionState;
 import com.hypixel.hytale.protocol.InteractionType;
 import com.hypixel.hytale.protocol.WaitForDataFrom;
@@ -25,6 +24,7 @@ import com.mrbysco.itemframes.component.BoundEntityComponent;
 import com.mrbysco.itemframes.component.ItemFrameComponent;
 import com.mrbysco.itemframes.util.FrameUtil;
 import com.mrbysco.itemframes.util.ItemHelper;
+import org.joml.Vector3i;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -49,9 +49,9 @@ public class ItemFrameInteraction extends SimpleBlockInteraction {
 	                                 @Nonnull CooldownHandler cooldownHandler) {
 		ItemStack itemstack = context.getHeldItem();
 
-		int x = targetBlock.getX();
-		int y = targetBlock.getY();
-		int z = targetBlock.getZ();
+		int x = targetBlock.x();
+		int y = targetBlock.y();
+		int z = targetBlock.z();
 		long indexChunk = ChunkUtil.indexChunkFromBlock(x, z);
 		WorldChunk worldchunk = world.getChunk(indexChunk);
 		BlockType blockType = worldchunk.getBlockType(targetBlock);
