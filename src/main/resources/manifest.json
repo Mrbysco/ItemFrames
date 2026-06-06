@@ -20,6 +20,6 @@
     "Main": "com.mrbysco.itemframes.ItemFramePlugin",
     "IncludesAssetPack": true,
     "UpdateChecker": {
-        "CurseForge": ""
+        "CurseForge": "1431861"
     }
 }
