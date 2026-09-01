@@ -59,61 +59,59 @@ public class ItemFrameInteraction extends SimpleBlockInteraction {
 			context.getState().state = InteractionState.Failed;
 			return;
 		}
-		var chunkRef = worldchunk.getBlockComponentEntity(x, y, z);
-		if (chunkRef == null) {
-			chunkRef = BlockModule.ensureBlockEntity(worldchunk, x, y, z);
-		}
+		Ref<ChunkStore> chunkRef = world.getChunkStore().getChunkSectionReferenceAtBlock(x, y, z);
+		if (chunkRef != null && chunkRef.isValid()) {
+			Store<ChunkStore> chunkStore = world.getChunkStore().getStore();
 
-		Store<ChunkStore> chunkStore = world.getChunkStore().getStore();
-
-		BoundEntityComponent boundEntityComponent = chunkStore.getComponent(chunkRef, ItemFramePlugin.get().getBoundEntityComponent());
-		if (boundEntityComponent != null && FrameUtil.isItemFrame(blockType.getId())) {
-			if (boundEntityComponent.getAttachedEntity() != null) {
-				Ref<EntityStore> boundRef = world.getEntityRef(boundEntityComponent.getAttachedEntity());
-				if (boundRef == null) {
-					context.getState().state = InteractionState.Failed;
-					return;
-				}
-
-				ItemFrameComponent frameComponent = commandBuffer.getComponent(boundRef, ItemFrameComponent.getComponentType());
-				if (frameComponent == null) {
-					context.getState().state = InteractionState.Failed;
-					return;
-				}
-				int yawDegrees = frameComponent.getFrameRotation();
-				ItemStack heldStack = frameComponent.getHeldStack();
-
-				if (heldStack != null && !heldStack.isEmpty()) {
-					ItemHelper.spawnItem(commandBuffer, frameComponent, boundRef);
-					frameComponent.setHeldStack(null);
-				}
-
-				heldStack = frameComponent.getHeldStack();
-				// Clone the held stack for comparison later
-				ItemStack heldClone = heldStack != null ? heldStack.withQuantity(1) : null;
-				if (heldStack == null) {
-					if (itemstack == null || itemstack.isEmpty()) {
+			BoundEntityComponent boundEntityComponent = chunkStore.getComponent(chunkRef, ItemFramePlugin.get().getBoundEntityComponent());
+			if (boundEntityComponent != null && FrameUtil.isItemFrame(blockType.getId())) {
+				if (boundEntityComponent.getAttachedEntity() != null) {
+					Ref<EntityStore> boundRef = world.getEntityRef(boundEntityComponent.getAttachedEntity());
+					if (boundRef == null) {
 						context.getState().state = InteractionState.Failed;
-					} else {
-						ItemStack stackClone = itemstack.withQuantity(1);
-						if (context.getHeldItemContainer() != null) {
-							ItemStackSlotTransaction itemstackslottransaction = context.getHeldItemContainer()
-									.removeItemStackFromSlot(context.getHeldItemSlot(), itemstack, 1);
-							if (!itemstackslottransaction.succeeded()) {
-								context.getState().state = InteractionState.Failed;
-								return;
-							}
+						return;
+					}
 
-							frameComponent.setHeldStack(stackClone);
+					ItemFrameComponent frameComponent = commandBuffer.getComponent(boundRef, ItemFrameComponent.getComponentType());
+					if (frameComponent == null) {
+						context.getState().state = InteractionState.Failed;
+						return;
+					}
+					int yawDegrees = frameComponent.getFrameRotation();
+					ItemStack heldStack = frameComponent.getHeldStack();
+
+					if (heldStack != null && !heldStack.isEmpty()) {
+						ItemHelper.spawnItem(commandBuffer, frameComponent, boundRef);
+						frameComponent.setHeldStack(null);
+					}
+
+					heldStack = frameComponent.getHeldStack();
+					// Clone the held stack for comparison later
+					ItemStack heldClone = heldStack != null ? heldStack.withQuantity(1) : null;
+					if (heldStack == null) {
+						if (itemstack == null || itemstack.isEmpty()) {
+							context.getState().state = InteractionState.Failed;
+						} else {
+							ItemStack stackClone = itemstack.withQuantity(1);
+							if (context.getHeldItemContainer() != null) {
+								ItemStackSlotTransaction itemstackslottransaction = context.getHeldItemContainer()
+										.removeItemStackFromSlot(context.getHeldItemSlot(), itemstack, 1);
+								if (!itemstackslottransaction.succeeded()) {
+									context.getState().state = InteractionState.Failed;
+									return;
+								}
+
+								frameComponent.setHeldStack(stackClone);
+							}
 						}
 					}
-				}
 
-				if (heldClone != frameComponent.getHeldStack()) {
-					commandBuffer.run(entityStore -> {
-						FrameUtil.remakeItemEntity(entityStore, boundRef, frameComponent.getHeldStack(), yawDegrees);
-						world.performBlockUpdate(x, y, z);
-					});
+					if (heldClone != frameComponent.getHeldStack()) {
+						commandBuffer.run(entityStore -> {
+							FrameUtil.remakeItemEntity(entityStore, boundRef, frameComponent.getHeldStack(), yawDegrees);
+							world.performBlockUpdate(x, y, z);
+						});
+					}
 				}
 			}
 		}

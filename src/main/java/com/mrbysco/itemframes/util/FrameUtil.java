@@ -17,7 +17,6 @@ import com.hypixel.hytale.server.core.asset.type.model.config.Model;
 import com.hypixel.hytale.server.core.asset.type.model.config.ModelAsset;
 import com.hypixel.hytale.server.core.entity.entities.BlockEntity;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
-import com.hypixel.hytale.server.core.modules.block.BlockModule;
 import com.hypixel.hytale.server.core.modules.entity.component.EntityScaleComponent;
 import com.hypixel.hytale.server.core.modules.entity.component.HeadRotation;
 import com.hypixel.hytale.server.core.modules.entity.component.ModelComponent;
@@ -80,25 +79,24 @@ public class FrameUtil {
 		int z = pos.z();
 		long indexChunk = ChunkUtil.indexChunkFromBlock(x, z);
 		WorldChunk worldchunk = world.getChunk(indexChunk);
-		var chunkRef = worldchunk.getBlockComponentEntity(x, y, z);
-		if (chunkRef == null) {
-			chunkRef = BlockModule.ensureBlockEntity(worldchunk, x, y, z);
+		Ref<ChunkStore> chunkRef = world.getChunkStore().getChunkSectionReferenceAtBlock(x, y, z);
+		if (chunkRef != null && chunkRef.isValid()) {
+			BlockType blockType = worldchunk.getBlockType(pos);
+			if (blockType == null) {
+				return null;
+			}
+
+			if (chunkRef == null) {
+				return null;
+			}
+
+			Store<ChunkStore> chunkStore = world.getChunkStore().getStore();
+			BoundEntityComponent boundEntityComponent = chunkStore.getComponent(chunkRef, ItemFramePlugin.get().getBoundEntityComponent());
+			if (boundEntityComponent != null && FrameUtil.isItemFrame(blockType.getId()) && boundEntityComponent.getAttachedEntity() != null) {
+				return world.getEntityRef(boundEntityComponent.getAttachedEntity());
+			}
 		}
 
-		BlockType blockType = worldchunk.getBlockType(pos);
-		if (blockType == null) {
-			return null;
-		}
-
-		if (chunkRef == null) {
-			return null;
-		}
-
-		Store<ChunkStore> chunkStore = world.getChunkStore().getStore();
-		BoundEntityComponent boundEntityComponent = chunkStore.getComponent(chunkRef, ItemFramePlugin.get().getBoundEntityComponent());
-		if (boundEntityComponent != null && FrameUtil.isItemFrame(blockType.getId()) && boundEntityComponent.getAttachedEntity() != null) {
-			return world.getEntityRef(boundEntityComponent.getAttachedEntity());
-		}
 		return null;
 	}
 
@@ -199,7 +197,7 @@ public class FrameUtil {
 
 		if (stack != null) {
 			ItemStack newStack = new ItemStack(stack.getItemId(), 1);
-			Item item = newStack.getItem();
+			Item item = Item.getAssetMap().getAsset(stack.getItemId());
 			AssetIconProperties properties = item.getIconProperties();
 			if (properties != null) {
 				scale = properties.getScale();
@@ -211,7 +209,8 @@ public class FrameUtil {
 			Model model = getItemModel(item);
 			if (model != null) {
 				String modelId = getItemModelId(item);
-				if (modelId != null) {
+				ItemFramePlugin.LOGGER.atInfo().log(modelId);
+				if (modelId != null && !modelId.isEmpty()) {
 					holder.addComponent(ModelComponent.getComponentType(), new ModelComponent(model));
 					holder.addComponent(
 							PersistentModel.getComponentType(),
@@ -257,25 +256,25 @@ public class FrameUtil {
 
 	@Nullable
 	public static String getItemModelId(@Nonnull Item item) {
-		String s = item.getModel();
-		if (s == null && item.hasBlockType()) {
-			BlockType blocktype = BlockType.getAssetMap().getAsset(item.getId());
-			if (blocktype != null && blocktype.getCustomModel() != null) {
-				s = blocktype.getCustomModel();
+		String modelId = item.getModel();
+		if (modelId == null && item.hasBlockType()) {
+			BlockType blockType = BlockType.getAssetMap().getAsset(item.getId());
+			if (blockType != null && blockType.getCustomModel() != null) {
+				modelId = blockType.getCustomModel();
 			}
 		}
 
-		return s;
+		return modelId;
 	}
 
 	@Nullable
 	public static Model getItemModel(@Nonnull Item item) {
-		String s = getItemModelId(item);
-		if (s == null) {
+		String modelId = getItemModelId(item);
+		if (modelId == null) {
 			return null;
-		} else {
-			ModelAsset modelasset = ModelAsset.getAssetMap().getAsset(s);
-			return modelasset != null ? Model.createStaticScaledModel(modelasset, 0.5F) : null;
 		}
+
+		ModelAsset modelAsset = ModelAsset.getAssetMap().getAsset(modelId);
+		return modelAsset != null ? Model.createStaticScaledModel(modelAsset, 0.5F) : null;
 	}
 }

@@ -11,7 +11,6 @@ import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.component.system.EntityEventSystem;
 import com.hypixel.hytale.component.system.tick.EntityTickingSystem;
 import com.hypixel.hytale.math.Axis;
-import com.hypixel.hytale.math.util.ChunkUtil;
 import com.hypixel.hytale.math.vector.Rotation3f;
 import com.hypixel.hytale.protocol.InteractionType;
 import com.hypixel.hytale.server.core.asset.type.blocktype.config.BlockType;
@@ -20,7 +19,6 @@ import com.hypixel.hytale.server.core.entity.UUIDComponent;
 import com.hypixel.hytale.server.core.event.events.ecs.BreakBlockEvent;
 import com.hypixel.hytale.server.core.event.events.ecs.PlaceBlockEvent;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
-import com.hypixel.hytale.server.core.modules.block.BlockModule;
 import com.hypixel.hytale.server.core.modules.entity.component.HeadRotation;
 import com.hypixel.hytale.server.core.modules.entity.component.Interactable;
 import com.hypixel.hytale.server.core.modules.entity.component.PropComponent;
@@ -32,7 +30,6 @@ import com.hypixel.hytale.server.core.modules.interaction.Interactions;
 import com.hypixel.hytale.server.core.prefab.PrefabCopyableComponent;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.World;
-import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.mrbysco.itemframes.ItemFramePlugin;
@@ -81,16 +78,8 @@ public class ItemFrameSystems {
 //			ItemFramePlugin.LOGGER.atInfo().log("Spawned Item Frame with UUID: " + spawnedUUID);
 			if (spawnedUUID != null) {
 				commandBuffer.run((entityStore) -> {
-					int i = targetBlock.x();
-					int j = targetBlock.z();
-					long indexChunk = ChunkUtil.indexChunkFromBlock(i, j);
-					WorldChunk worldchunk = world.getChunk(indexChunk);
-					var chunkRef = worldchunk.getBlockComponentEntity(targetBlock.x, targetBlock.y, targetBlock.z);
-					if (chunkRef == null) {
-						chunkRef = BlockModule.ensureBlockEntity(worldchunk, targetBlock.x, targetBlock.y, targetBlock.z);
-					}
-
-					if (chunkRef != null) {
+					Ref<ChunkStore> chunkRef = world.getChunkStore().getChunkSectionReferenceAtBlock(targetBlock.x, targetBlock.y, targetBlock.z);
+					if (chunkRef != null && chunkRef.isValid()) {
 						Store<ChunkStore> chunkstore2 = world.getChunkStore().getStore();
 						chunkstore2.putComponent(chunkRef, ItemFramePlugin.get().getBoundEntityComponent(), new BoundEntityComponent(spawnedUUID));
 					}
