@@ -1,14 +1,14 @@
 {
     "Group": "com.mrbysco",
     "Name": "ItemFrames",
-    "Version": "0.5.0",
+    "Version": "0.6.0",
     "Description": "Adds item frames to display your items",
     "Authors": [
         {
             "Name": "Mrbysco"
         }
     ],
-    "Website": "",
+    "Website": "https://www.curseforge.com/hytale/mods/item-frames",
     "ServerVersion": ">=0.7.5 <0.8.0",
     "Dependencies": {
         "Hytale:AssetModule": "*"

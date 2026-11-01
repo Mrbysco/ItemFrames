@@ -68,7 +68,7 @@ if (System.getenv().CURSEFORGE_KEY) {
 
         def mainFile = upload(project.curseforgeID, jar)
         mainFile.releaseType = 'release'
-        mainFile.addGameVersion("0.6")
+        mainFile.addGameVersion("0.7")
 
         mainFile.changelog = file("$project.rootDir/changelog.md")
         mainFile.changelogType = 'markdown'
