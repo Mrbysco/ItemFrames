@@ -30,6 +30,7 @@ import com.hypixel.hytale.server.core.modules.interaction.Interactions;
 import com.hypixel.hytale.server.core.prefab.PrefabCopyableComponent;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.World;
+import com.hypixel.hytale.server.core.universe.world.chunk.section.BlockSection;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.mrbysco.itemframes.ItemFramePlugin;
@@ -179,14 +180,25 @@ public class ItemFrameSystems {
 					});
 				} else {
 					World world = store.getExternalData().getWorld();
-					BlockType blockType = world.getBlockType(component.getFramePosition());
-					if (blockType == null || !FrameUtil.isItemFrame(blockType.getId())) {
-						commandBuffer.run((entityStore) -> {
-							if (held != null) {
-								ItemHelper.spawnItem(entityStore, component, ref);
+					int x = component.getFramePosition().x;
+					int y = component.getFramePosition().y;
+					int z = component.getFramePosition().z;
+					ChunkStore chunkStore = world.getChunkStore();
+					Ref<ChunkStore> sectionRef = chunkStore.getChunkSectionReferenceAtBlock(x, y, z);
+					if (sectionRef != null && sectionRef.isValid()) {
+						BlockSection blockSection = chunkStore.getStore().getComponent(sectionRef, BlockSection.getComponentType());
+						if (blockSection != null) {
+							int blockId = blockSection.get(x, y, z);
+							BlockType blockType = BlockType.getAssetMap().getAsset(blockId);
+							if (blockType == null || !FrameUtil.isItemFrame(blockType.getId())) {
+								commandBuffer.run((entityStore) -> {
+									if (held != null) {
+										ItemHelper.spawnItem(entityStore, component, ref);
+									}
+									store.removeEntity(ref, RemoveReason.REMOVE);
+								});
 							}
-							store.removeEntity(ref, RemoveReason.REMOVE);
-						});
+						}
 					}
 				}
 			}

@@ -12,6 +12,10 @@ import com.hypixel.hytale.server.core.inventory.transaction.ItemStackSlotTransac
 import com.hypixel.hytale.server.core.modules.interaction.interaction.CooldownHandler;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.SimpleInstantInteraction;
 import com.hypixel.hytale.server.core.universe.world.World;
+import com.hypixel.hytale.server.core.universe.world.chunk.BlockOperations;
+import com.hypixel.hytale.server.core.universe.world.chunk.section.BlockSection;
+import com.hypixel.hytale.server.core.universe.world.chunk.section.ChunkSection;
+import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.mrbysco.itemframes.component.ItemFrameComponent;
 import com.mrbysco.itemframes.util.FrameUtil;
@@ -82,8 +86,16 @@ public class ItemFrameEntityInteraction extends SimpleInstantInteraction {
 
 			if (heldClone != frameComponent.getHeldStack()) {
 				commandBuffer.run(entityStore -> {
-					FrameUtil.remakeItemEntity(entityStore, targetRef, frameComponent.getHeldStack(), yawDegrees);
-					world.performBlockUpdate(x, y, z);
+					Ref<ChunkStore> section = world.getChunkStore().getChunkSectionReferenceAtBlock(x, y, z);
+					if (section == null) {
+						return;
+					}
+					BlockSection blockSection = section.getStore().getComponent(section, BlockSection.getComponentType());
+					ChunkSection chunkSection = section.getStore().getComponent(section, ChunkSection.getComponentType());
+					if (blockSection != null && chunkSection != null) {
+						FrameUtil.remakeItemEntity(entityStore, targetRef, frameComponent.getHeldStack(), yawDegrees);
+						BlockOperations.updateBlockArea(world.getChunkStore(), chunkSection, blockSection, x, y, z);
+					}
 				});
 			}
 		} else {

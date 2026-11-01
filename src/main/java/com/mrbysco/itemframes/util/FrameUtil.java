@@ -23,7 +23,10 @@ import com.hypixel.hytale.server.core.modules.entity.component.ModelComponent;
 import com.hypixel.hytale.server.core.modules.entity.component.PersistentModel;
 import com.hypixel.hytale.server.core.modules.entity.item.ItemComponent;
 import com.hypixel.hytale.server.core.universe.world.World;
+import com.hypixel.hytale.server.core.universe.world.chunk.BlockOperations;
 import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
+import com.hypixel.hytale.server.core.universe.world.chunk.section.BlockSection;
+import com.hypixel.hytale.server.core.universe.world.chunk.section.ChunkSection;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.mrbysco.itemframes.ItemFramePlugin;
@@ -77,23 +80,22 @@ public class FrameUtil {
 		int x = pos.x();
 		int y = pos.y();
 		int z = pos.z();
-		long indexChunk = ChunkUtil.indexChunkFromBlock(x, z);
-		WorldChunk worldchunk = world.getChunk(indexChunk);
-		Ref<ChunkStore> chunkRef = world.getChunkStore().getChunkSectionReferenceAtBlock(x, y, z);
-		if (chunkRef != null && chunkRef.isValid()) {
-			BlockType blockType = worldchunk.getBlockType(pos);
-			if (blockType == null) {
-				return null;
-			}
+		ChunkStore chunkStore = world.getChunkStore();
+		Ref<ChunkStore> sectionRef = chunkStore.getChunkSectionReferenceAtBlock(x, y, z);
+		if (sectionRef != null && sectionRef.isValid()) {
+			BlockSection blockSection = chunkStore.getStore().getComponent(sectionRef, BlockSection.getComponentType());
+			if (blockSection != null) {
+				int blockId = blockSection.get(x, y, z);
+				BlockType blockType = BlockType.getAssetMap().getAsset(blockId);
+				if (blockType == null) {
+					return null;
+				}
 
-			if (chunkRef == null) {
-				return null;
-			}
-
-			Store<ChunkStore> chunkStore = world.getChunkStore().getStore();
-			BoundEntityComponent boundEntityComponent = chunkStore.getComponent(chunkRef, ItemFramePlugin.get().getBoundEntityComponent());
-			if (boundEntityComponent != null && FrameUtil.isItemFrame(blockType.getId()) && boundEntityComponent.getAttachedEntity() != null) {
-				return world.getEntityRef(boundEntityComponent.getAttachedEntity());
+				Store<ChunkStore> chunkComponentStore = chunkStore.getStore();
+				BoundEntityComponent boundEntityComponent = chunkComponentStore.getComponent(sectionRef, ItemFramePlugin.get().getBoundEntityComponent());
+				if (boundEntityComponent != null && FrameUtil.isItemFrame(blockType.getId()) && boundEntityComponent.getAttachedEntity() != null) {
+					return world.getEntityRef(boundEntityComponent.getAttachedEntity());
+				}
 			}
 		}
 
@@ -141,8 +143,16 @@ public class FrameUtil {
 			int z = pos.z();
 			frameComponent.setHeldStack(stack);
 			commandBuffer.run(entityStore -> {
-				FrameUtil.remakeItemEntity(entityStore, frameRef, stack, frameComponent.getFrameRotation());
-				world.performBlockUpdate(x, y, z);
+				Ref<ChunkStore> section = world.getChunkStore().getChunkSectionReferenceAtBlock(x, y, z);
+				if (section == null) {
+					return;
+				}
+				BlockSection blockSection = section.getStore().getComponent(section, BlockSection.getComponentType());
+				ChunkSection chunkSection = section.getStore().getComponent(section, ChunkSection.getComponentType());
+				if (blockSection != null && chunkSection != null) {
+					FrameUtil.remakeItemEntity(entityStore, frameRef, stack, frameComponent.getFrameRotation());
+					BlockOperations.updateBlockArea(world.getChunkStore(), chunkSection, blockSection, x, y, z);
+				}
 			});
 			return true;
 		}
